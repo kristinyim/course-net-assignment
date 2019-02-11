@@ -1,7 +1,7 @@
 ###############################################################################
 # server-python.py
-# Name:
-# NetId:
+# Name: Kristin Yim
+# NetId: kyim6
 ###############################################################################
 
 import sys
@@ -16,13 +16,17 @@ def server(server_port):
     s.bind(('127.0.0.1', server_port))
     s.listen(QUEUE_LENGTH)
     conn, addr = s.accept()
-    msg = ''
-    while not '\n' in msg:
-        data = conn.recv(RECV_BUFFER_SIZE)
-        if not data:
+    
+    total_size = int(conn.recv(RECV_BUFFER_SIZE))
+    bytes_recd = 0
+    chunks = []
+    while bytes_recd < total_size:
+        chunk = conn.recv(min(total_size - bytes_recd, RECV_BUFFER_SIZE))
+        if chunk == '':
             break
-        msg += data
-    sys.stdout.write(msg)
+        chunks.append(chunk)
+        bytes_recd += len(chunk)
+    sys.stdout.write(''.join(chunks))
     sys.stdout.flush()
     conn.close()
 
