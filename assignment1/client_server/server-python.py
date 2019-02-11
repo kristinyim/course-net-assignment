@@ -16,8 +16,13 @@ def server(server_port):
     s.bind(('127.0.0.1', server_port))
     s.listen(QUEUE_LENGTH)
     conn, addr = s.accept()
-    data = conn.recv(RECV_BUFFER_SIZE)
-    sys.stdout.write(data)
+    msg = ''
+    while not '\n' in msg:
+        data = conn.recv(RECV_BUFFER_SIZE)
+        if not data:
+            break
+        msg += data
+    sys.stdout.write(msg)
     sys.stdout.flush()
     conn.close()
 

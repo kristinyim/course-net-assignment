@@ -9,11 +9,12 @@ import socket
 
 SEND_BUFFER_SIZE = 2048
 
-def client(server_ip, server_port):
+def client(server_ip, server_port, msg):
     """TODO: Open socket and send message from sys.stdin"""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, SEND_BUFFER_SIZE)
     s.connect((server_ip, server_port))
-    s.sendall("Hello, world!\n")
+    s.sendall(msg)
     s.close()
 
 def main():
@@ -22,7 +23,8 @@ def main():
         sys.exit("Usage: python client-python.py [Server IP] [Server Port] < [message]")
     server_ip = sys.argv[1]
     server_port = int(sys.argv[2])
-    client(server_ip, server_port)
+    msg = sys.stdin.read()
+    client(server_ip, server_port, msg)
 
 if __name__ == "__main__":
     main()
