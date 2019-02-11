@@ -15,20 +15,24 @@ def server(server_port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('127.0.0.1', server_port))
     s.listen(QUEUE_LENGTH)
-    conn, addr = s.accept()
-    
-    total_size = int(conn.recv(RECV_BUFFER_SIZE))
-    bytes_recd = 0
-    chunks = []
-    while bytes_recd < total_size:
-        chunk = conn.recv(min(total_size - bytes_recd, RECV_BUFFER_SIZE))
-        if chunk == '':
+
+    while True:
+        try:
+            conn, addr = s.accept()
+            total_size = int(conn.recv(RECV_BUFFER_SIZE))
+            bytes_recd = 0
+            chunks = []
+            while bytes_recd < total_size:
+                chunk = conn.recv(min(total_size - bytes_recd, RECV_BUFFER_SIZE))
+                if chunk == '':
+                    break
+                chunks.append(chunk)
+                bytes_recd += len(chunk)
+            sys.stdout.write(''.join(chunks))
+            sys.stdout.flush()
+            conn.close()
+        except KeyboardInterrupt:
             break
-        chunks.append(chunk)
-        bytes_recd += len(chunk)
-    sys.stdout.write(''.join(chunks))
-    sys.stdout.flush()
-    conn.close()
 
 def main():
     """Parse command-line argument and call server function """
