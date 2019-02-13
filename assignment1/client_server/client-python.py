@@ -1,7 +1,7 @@
 ###############################################################################
 # client-python.py
-# Name:
-# NetId:
+# Name: Kristin Yim
+# NetId: kyim6
 ###############################################################################
 
 import sys
@@ -10,7 +10,6 @@ import socket
 SEND_BUFFER_SIZE = 2048
 
 def client(server_ip, server_port, msg):
-    """TODO: Open socket and send message from sys.stdin"""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, SEND_BUFFER_SIZE)
     s.connect((server_ip, server_port))

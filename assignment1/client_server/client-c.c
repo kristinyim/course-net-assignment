@@ -1,7 +1,7 @@
 /*****************************************************************************
  * client-c.c
- * Name:
- * NetId:
+ * Name: Kristin Yim
+ * NetId: kyim6
  *****************************************************************************/
 
 #include <stdio.h>
@@ -14,14 +14,10 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #define SEND_BUFFER_SIZE 2048
 
-
-/* TODO: client()
- * Open socket and send message from stdin.
- * Return 0 on success, non-zero on failure
-*/
 int client(char *server_ip, char *server_port) {
   // create socket
   int sock = 0;
@@ -52,8 +48,16 @@ int client(char *server_ip, char *server_port) {
   }
 
   // send data
-  char buffer[SEND_BUFFER_SIZE] = "Hello, world!\n";
-  send(sock, buffer, strlen(buffer), 0);
+  while (true)
+  {
+    char buffer[SEND_BUFFER_SIZE];
+    ssize_t num_bytes = read(STDIN_FILENO, buffer, SEND_BUFFER_SIZE);
+    if (!num_bytes)
+    {
+      break;
+    }
+    send(sock, buffer, num_bytes, 0);
+  }
 
   // close socket
   close(sock);
@@ -73,7 +77,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "Usage: ./client-c [server IP] [server port] < [message]\n");
     exit(EXIT_FAILURE);
   }
-
+  
   server_ip = argv[1];
   server_port = argv[2];
   return client(server_ip, server_port);

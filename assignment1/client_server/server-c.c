@@ -1,7 +1,7 @@
 /*****************************************************************************
  * server-c.c
- * Name:
- * NetId:
+ * Name: Kristin Yim
+ * NetId: kyim6
  *****************************************************************************/
 
 #include <stdio.h>
@@ -14,15 +14,11 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #define QUEUE_LENGTH 10
 #define RECV_BUFFER_SIZE 2048
 
-/* TODO: server()
- * Open socket and wait for client to connect
- * Print received message to stdout
- * Return 0 on success, non-zero on failure
-*/
 int server(char *server_port) {
   // create socket file descriptor
   int server_fd;
@@ -53,29 +49,38 @@ int server(char *server_port) {
   }
 
   // listen to incoming connections
-  if (listen(server_fd, 1) < 0)
+  if (listen(server_fd, QUEUE_LENGTH) < 0)
   {
     perror("listen failed");
     exit(EXIT_FAILURE);
   }
 
   // accept a connection
-  int sock;
-  int addrlen = sizeof(address);
-  if ((sock = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
-  {
-    perror("accept failed");
-    exit(EXIT_FAILURE);
+  while (true) {
+    int sock;
+    int addrlen = sizeof(address);
+    if ((sock = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
+    {
+      perror("accept failed");
+      exit(EXIT_FAILURE);
+    }
+
+    // receive message
+    while (true)
+    {
+      char buffer[RECV_BUFFER_SIZE];
+      int recv_bytes = recv(sock, buffer, RECV_BUFFER_SIZE, 0);
+      if (!recv_bytes)
+      {
+        break;
+      }
+      fwrite(buffer, recv_bytes, 1, stdout);
+      fflush(stdout);
+    }
+
+    // close socket
+    close(sock);
   }
-
-  // receive message
-  char buffer[RECV_BUFFER_SIZE];
-  int recv_bytes = recv(sock, buffer, RECV_BUFFER_SIZE, 0);
-  fwrite(buffer, recv_bytes, 1, stdout);
-  fflush(stdout);
-
-  // close socket
-  close(sock);
 
   return 0;
 }
