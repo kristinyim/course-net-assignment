@@ -15,15 +15,17 @@ def server(server_port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('127.0.0.1', server_port))
     s.listen(QUEUE_LENGTH)
-    conn, addr = s.accept()
-    msg = ''
-    while not '\n' in msg:
-        data = conn.recv(RECV_BUFFER_SIZE)
-        if not data:
+
+    while True:
+        conn, addr = s.accept()
+        while True:
+            data = conn.recv(RECV_BUFFER_SIZE)
+            if not data:
+                break
+            sys.stdout.write(data)
+            sys.stdout.flush()
+        if not conn:
             break
-        msg += data
-    sys.stdout.write(msg)
-    sys.stdout.flush()
     conn.close()
 
 def main():
